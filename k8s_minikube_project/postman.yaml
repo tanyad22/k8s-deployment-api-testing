@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postman-deployment
+  labels:
+    app: postman
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postman
+  template:
+    metadata:
+      labels:
+        app: postman
+    spec:
+      containers:
+      - name: postman
+        image: newman_mini:1.0
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+          command:
+             - run
+             - MP20_Allergy_REST_APIs_collection.json
+             - -e
+             - TEST-MP-NL.postman_environment.json
+             - -r
+             - --reporter-influxdb-server
+             - influxdb-service
+             - --reporter-influxdb-port
+             - 8086
+             - --reporter-influxdb-org
+             - valueFrom:
+               secretKeyRef:
+                 name: influxdb-secret
+                 key: influxdb_org
+             - --reporter-influxdb-version
+             - "2"
+             - --reporter-influxdb-name
+             - valueFrom:
+               secretKeyRef:
+                 name: influxdb-secret
+                 key: influxdb_bucket
+             - --reporter-influxdb-username
+             - valueFrom:
+               secretKeyRef:
+                 name: influxdb-secret
+                 key: influxdb_username
+             - ---reporter-influxdb-measurement
+             - k8s_testing

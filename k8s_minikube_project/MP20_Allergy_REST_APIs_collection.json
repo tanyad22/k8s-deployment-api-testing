@@ -1,0 +1,773 @@
+{
+  "info": {
+    "_postman_id": "4395b480-1ffb-4150-8711-cfa9d3435df9",
+    "name": "MP20_Allergy_REST_APIs",
+    "description": "Collection for testing M.P 2.0 Rest API's related to Allergy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "14978049"
+  },
+  "item": [
+    {
+      "name": "Allergy",
+      "item": [
+        {
+          "name": "Create an Allergy",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const moment = require('moment');\r",
+                  "pm.environment.set(\"startDate\", moment().add(_.random(-60, 20), 'days').format('YYYY-MM-DD'));\r",
+                  "pm.environment.set(\"endDate\", moment().add(_.random(21, 70), 'days').format('YYYY-MM-DD'));\r",
+                  "\r",
+                  "pm.environment.set(\"snomedCode\", \"A\" + pm.variables.replaceIn('{{$randomCreditCardMask}}'));\r",
+                  "pm.environment.set(\"name\", pm.variables.replaceIn('{{$randomProduct}}') + pm.variables.replaceIn('{{$randomCreditCardMask}}'));\r",
+                  "\r",
+                  "let cat=[ \"FOOD\", \"ENVIRONMENT\", \"SUBSTANCE_OR_PRODUCT\", \"OTHER\" ];\r",
+                  "pm.environment.set(\"category\",cat[_.random(0,3)]);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "let response = pm.response.json();\r",
+                  "pm.environment.set(\"allergyID\",response.id);\r",
+                  "pm.environment.set(\"status\",response.status);\r",
+                  "\r",
+                  "pm.test(\"Allergy should be created with name\", function(){\r",
+                  "    pm.expect(response.name).to.eql(pm.environment.get(\"name\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should be created with snomedCode\", function(){\r",
+                  "    pm.expect(response.snomedCode).to.eql(pm.environment.get(\"snomedCode\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should be created with startDate\", function(){\r",
+                  "    pm.expect(response.startDate).to.eql(pm.environment.get(\"startDate\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should be created with endDate\", function(){\r",
+                  "    pm.expect(response.endDate).to.eql(pm.environment.get(\"endDate\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should be created with category\", function(){\r",
+                  "    pm.expect(response.category).to.eql(pm.environment.get(\"category\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is below 130\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(130);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"{{name}}\",\r\n  \"snomedCode\": \"{{snomedCode}}\",\r\n  \"startDate\": \"{{startDate}}\",\r\n  \"endDate\": \"{{endDate}}\",\r\n  \"category\": \"{{category}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/mp/allergies",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "mp",
+                "allergies"
+              ]
+            },
+            "description": "Test request related to creating an allergy"
+          },
+          "response": []
+        },
+        {
+          "name": "Get an Allergy by ID",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "let response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Allergy should have name\", function(){\r",
+                  "    pm.expect(response.name).to.eql(pm.environment.get(\"name\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should have snomedCode\", function(){\r",
+                  "    pm.expect(response.snomedCode).to.eql(pm.environment.get(\"snomedCode\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should have startDate\", function(){\r",
+                  "    pm.expect(response.startDate).to.eql(pm.environment.get(\"startDate\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should have endDate\", function(){\r",
+                  "    pm.expect(response.endDate).to.eql(pm.environment.get(\"endDate\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should have status\", function(){\r",
+                  "    pm.expect(response.status).to.eql(pm.environment.get(\"status\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should have category\", function(){\r",
+                  "    pm.expect(response.category).to.eql(pm.environment.get(\"category\"));\r",
+                  "});\r",
+                  "\r",
+                  "var jsonData = JSON.parse(responseBody);\r",
+                  "tests[\"Response is not null\"] = jsonData !== null ;\r",
+                  "\r",
+                  "pm.test(\"Response time is below 116\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(116);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/mp/allergies/{{allergyID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "mp",
+                "allergies",
+                "{{allergyID}}"
+              ]
+            },
+            "description": "Test request related to get an allergy by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update an Allergy",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const moment = require('moment');\r",
+                  "pm.environment.set(\"startDate\", moment().add(_.random(-60, 20), 'days').format('YYYY-MM-DD'));\r",
+                  "pm.environment.set(\"endDate\", moment().add(_.random(21, 70), 'days').format('YYYY-MM-DD'));\r",
+                  "\r",
+                  "pm.environment.set(\"snomedCode\", \"A\" + pm.variables.replaceIn('{{$randomCreditCardMask}}'));\r",
+                  "pm.environment.set(\"name\", pm.variables.replaceIn('{{$randomProduct}}') + pm.variables.replaceIn('{{$randomCreditCardMask}}'));\r",
+                  "\r",
+                  "let cat=[ \"FOOD\", \"ENVIRONMENT\", \"SUBSTANCE_OR_PRODUCT\", \"OTHER\" ];\r",
+                  "pm.environment.set(\"category\",cat[_.random(0,3)]);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "let response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Allergy should be updated with name\", function(){\r",
+                  "    pm.expect(response.name).to.eql(pm.environment.get(\"name\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should be updated with snomedCode\", function(){\r",
+                  "    pm.expect(response.snomedCode).to.eql(pm.environment.get(\"snomedCode\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should be updated with startDate\", function(){\r",
+                  "    pm.expect(response.startDate).to.eql(pm.environment.get(\"startDate\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should be updated with endDate\", function(){\r",
+                  "    pm.expect(response.endDate).to.eql(pm.environment.get(\"endDate\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Allergy should be updated with category\", function(){\r",
+                  "    pm.expect(response.category).to.eql(pm.environment.get(\"category\"));\r",
+                  "});\r",
+                  "\r",
+                  "var jsonData = JSON.parse(responseBody);\r",
+                  "tests[\"Response is not null\"] = jsonData !== null ;\r",
+                  "\r",
+                  "pm.test(\"Response time is below 125\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(125);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"{{name}}\",\r\n  \"snomedCode\": \"{{snomedCode}}\",\r\n  \"startDate\": \"{{startDate}}\",\r\n  \"endDate\": \"{{endDate}}\",\r\n  \"category\": \"{{category}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/mp/allergies/{{allergyID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "mp",
+                "allergies",
+                "{{allergyID}}"
+              ]
+            },
+            "description": "Test request related to updating an allergy"
+          },
+          "response": []
+        },
+        {
+          "name": "Download an Example CSV Import Allergy File",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is below 93\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(93);",
+                  "});\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/mp/allergies/import/example",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "mp",
+                "allergies",
+                "import",
+                "example"
+              ]
+            },
+            "description": "Test request related to get an example file with already added allergies in it"
+          },
+          "response": [
+            {
+              "name": "Download an Example CSV Import Allergy File",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{host}}/mp/allergies/import/example",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "path": [
+                    "mp",
+                    "allergies",
+                    "import",
+                    "example"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "plain",
+              "header": [
+                {
+                  "key": "vary",
+                  "value": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers"
+                },
+                {
+                  "key": "set-cookie",
+                  "value": "JSESSIONID=4ACE18AAAA73291244B6F998EE384128; Path=/; Secure; HttpOnly"
+                },
+                {
+                  "key": "content-disposition",
+                  "value": "attachment; filename=allergy.csv"
+                },
+                {
+                  "key": "accept-ranges",
+                  "value": "bytes"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "x-xss-protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "expires",
+                  "value": "0"
+                },
+                {
+                  "key": "strict-transport-security",
+                  "value": "max-age=31536000 ; includeSubDomains"
+                },
+                {
+                  "key": "content-type",
+                  "value": "text/csv"
+                },
+                {
+                  "key": "content-length",
+                  "value": "323"
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 04 Feb 2021 09:43:01 GMT"
+                },
+                {
+                  "key": "x-envoy-upstream-service-time",
+                  "value": "20"
+                },
+                {
+                  "key": "server",
+                  "value": "envoy"
+                }
+              ],
+              "cookie": [],
+              "body": "name,type,snomedCode,startDate,endDate\nallergyName1,MEDICATION,9998,2020-01-01,2020-10-30\nallergyName2,GENERAL,9990,2020-01-02,2030-10-30\nallergyName3,MEDICATION,55679,2020-01-03,\nallergyName4,MEDICATION,123789,2020-01-25,2050-10-30\nallergyName5,GENERAL,76512,2020-02-13,2050-10-30\nallergyName6,MEDICATION,5239,2019-09-13,\n"
+            }
+          ]
+        },
+        {
+          "name": "Get All Allergies",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"numRecordsPerPage\",_.random(1,20));\r",
+                  "pm.environment.set(\"numPages\",_.random(1,200));\r",
+                  "\r",
+                  "const sort = [\"asc\", \"desc\"];\r",
+                  "pm.environment.set(\"sort\",sort[_.random(0,1)]);\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "let response = pm.response.json();\r",
+                  "\r",
+                  "pm.test('Has allergy ID', function() {\r",
+                  "    let has_code = false;\r",
+                  "    let counter = 0;\r",
+                  "    response.content.forEach(function(object){\r",
+                  "      if(object.id === pm.environment.get(\"allergyID\")) {\r",
+                  "         has_code = true;\r",
+                  "         counter++;\r",
+                  "      }\r",
+                  "  });\r",
+                  "    pm.expect((has_code) && (counter == 1) ).to.eql(true);\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "var jsonData = JSON.parse(responseBody);\r",
+                  "tests[\"Response is not null\"] = jsonData !== null ;\r",
+                  "\r",
+                  "// response time should be below 500ms\r",
+                  "pm.test(\"Response time is below 94\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(94);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/mp/allergies",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "mp",
+                "allergies"
+              ],
+              "query": [
+                {
+                  "key": "numPages",
+                  "value": "{{numPages}}",
+                  "disabled": true
+                },
+                {
+                  "key": "numRecords",
+                  "value": "{{numRecordsPerPage}}",
+                  "disabled": true
+                },
+                {
+                  "key": "sort array",
+                  "value": "{{sort}}",
+                  "disabled": true
+                },
+                {
+                  "key": "name",
+                  "value": "{{name}}",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "{{status}}",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "{{type}}",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "{{startDate}}",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "{{endDate}}",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get a list of all allergies"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete an Allergy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "let response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Medical Note Category should be deleted\", function () {\r",
+                  "    var response = pm.response.json();\r",
+                  "    pm.expect(response.deletedId).to.eql(pm.environment.get(\"allergyID\"));\r",
+                  "});\r",
+                  "\r",
+                  "var jsonData = JSON.parse(responseBody);\r",
+                  "tests[\"Response is not null\"] = jsonData !== null ;\r",
+                  "\r",
+                  "// response time should be below 300ms\r",
+                  "pm.test(\"Response time is below 107\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(107);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/mp/allergies/{{allergyID}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "mp",
+                "allergies",
+                "{{allergyID}}"
+              ]
+            },
+            "description": "Test request related to deleting an allergy"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Allergies (deleted Allergy should not be present)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"numRecordsPerPage\",_.random(1,20));\r",
+                  "pm.environment.set(\"numPages\",_.random(1,200));\r",
+                  "\r",
+                  "const sort = [\"asc\", \"desc\"];\r",
+                  "pm.environment.set(\"sort\",sort[_.random(0,1)]);\r",
+                  "\r",
+                  "const terms = [pm.environment.get(\"name\"), pm.environment.get(\"snomedCode\")]\r",
+                  "pm.environment.set(\"searchTerm\",terms[_.random(0,1)]);\r",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "let response = pm.response.json();\r",
+                  "\r",
+                  "pm.test('Has ID', function() {\r",
+                  "    let has_code = false;\r",
+                  "    response.content.forEach(function(object){\r",
+                  "      if(object.id === pm.environment.get(\"allergyID\")) {\r",
+                  "         has_code = true;\r",
+                  "      }\r",
+                  "  });\r",
+                  "    pm.expect(has_code).to.eql(false);\r",
+                  "});\r",
+                  "\r",
+                  "var jsonData = JSON.parse(responseBody);\r",
+                  "tests[\"Response is not null\"] = jsonData !== null ;\r",
+                  "\r",
+                  "// response time should be below 300ms\r",
+                  "pm.test(\"Response time is below 88\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(88);",
+                  "});\r",
+                  "\r",
+                  "pm.environment.unset(\"allergyID\");\r",
+                  "pm.environment.unset(\"snomedCode\");\r",
+                  "pm.environment.unset(\"name\");\r",
+                  "pm.environment.unset(\"startDate\");\r",
+                  "pm.environment.unset(\"endDate\");\r",
+                  "pm.environment.unset(\"status\");\r",
+                  "pm.environment.unset(\"sort\");\r",
+                  "pm.environment.unset(\"numPages\");\r",
+                  "pm.environment.unset(\"numRecordsPerPage\");\r",
+                  "pm.environment.unset(\"searchTerm\");\r",
+                  "pm.environment.unset(\"type\");\r",
+                  "pm.environment.unset(\"category\");\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/mp/allergies",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "mp",
+                "allergies"
+              ],
+              "query": [
+                {
+                  "key": "numPages",
+                  "value": "{{numPages}}",
+                  "disabled": true
+                },
+                {
+                  "key": "numRecords",
+                  "value": "{{numRecordsPerPage}}",
+                  "disabled": true
+                },
+                {
+                  "key": "sort array",
+                  "value": "{{sort}}",
+                  "disabled": true
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "{{searchTerm}}",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "{{status}}",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Validate that the previously deleted allergy is no longer present"
+          },
+          "response": []
+        }
+      ],
+      "description": "API test request related to Allergy REST controller",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "accessToken",
+        "value": "{{access_token}}",
+        "type": "string"
+      },
+      {
+        "key": "addTokenTo",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "function getvar(variableName) {",
+          "    let value = pm.environment.get(variableName);",
+          "    if (!value) throw new Error(",
+          "        `Variable '${variableName}' is not defined. Do you forget to select an environment?`);",
+          "    return value;",
+          "}",
+          "",
+          "let host = getvar(\"keycloak.host\");",
+          "let client_id = getvar(\"keycloak.client-id\");",
+          "let client_secret = getvar(\"keycloak.client-secret\");",
+          "let requestOption = {",
+          "    url: host + '/auth/realms/medical-portal/protocol/openid-connect/token',",
+          "    method: 'POST',",
+          "    header: {",
+          "        'Content-Type': 'application/x-www-form-urlencoded',",
+          "          },",
+          "      body: {",
+          "        mode: 'urlencoded',",
+          "        'urlencoded': [",
+          "            {key: \"username\", value: 'mpadmin'},",
+          "            {key: \"password\", value: 'passpass'},",
+          "            {key: \"client_id\", value: client_id},",
+          "            {key: \"client_secret\", value: client_secret},",
+          "            {key: \"scope\", value: 'openid'},",
+          "            {key: \"grant_type\", value: \"password\"}",
+          "        ]",
+          "      }",
+          "}",
+          "",
+          "let getToken = true;",
+          "",
+          "if (!pm.environment.get('accessTokenExpiry') || ",
+          "    !pm.environment.get('access_token')) {",
+          "    console.log('Token or expiry date are missing')",
+          "} else if (pm.environment.get('accessTokenExpiry') <= (new Date()).getTime()) {",
+          "    console.log('Token is expired')",
+          "} else {",
+          "    getToken = false;",
+          "    console.log('Token and expiry date are all good');",
+          "}",
+          "",
+          "if (getToken === true) {",
+          "    pm.sendRequest(requestOption,  function(err, response) {",
+          "        console.log(err ? err : response.json());",
+          "        if (err === null) {",
+          "            console.log('Saving the token and expiry date')",
+          "            const jsonResponse = response.json();",
+          "            pm.environment.set(\"access_token\", jsonResponse.access_token);",
+          "    ",
+          "            var expiryDate = new Date();",
+          "            expiryDate.setSeconds(expiryDate.getSeconds() + jsonResponse.expires_in);",
+          "            pm.environment.set('accessTokenExpiry', expiryDate.getTime());",
+          "        }",
+          "    })",
+          "}    "
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

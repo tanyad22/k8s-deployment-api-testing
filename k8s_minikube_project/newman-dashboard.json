@@ -1,0 +1,234 @@
+{
+    "annotations": {
+        "list": [{
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "target": {
+                "limit": 100,
+                "matchAny": false,
+                "tags": [],
+                "type": "dashboard"
+            },
+            "type": "dashboard"
+        }]
+    },
+    "description": "Template regarding REST API  testing on daily basis ",
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 2,
+    "iteration": 1641376027936,
+    "links": [],
+    "liveNow": false,
+    "panels": [{
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "id": 30,
+            "panels": [],
+            "repeat": "collectionName",
+            "title": "Stat Panel",
+            "type": "row"
+        },
+        {
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "displayMode": "color-text",
+                        "filterable": true
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [{
+                            "color": "green",
+                            "value": null
+                        }]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 12,
+                "w": 24,
+                "x": 0,
+                "y": 1
+            },
+            "id": 2,
+            "maxPerRow": 4,
+            "options": {
+                "footer": {
+                    "fields": "",
+                    "reducer": [
+                        "sum"
+                    ],
+                    "show": false
+                },
+                "frameIndex": 0,
+                "showHeader": true,
+                "sortBy": [{
+                    "desc": true,
+                    "displayName": "Failed Test"
+                }]
+            },
+            "pluginVersion": "8.3.3",
+            "repeatDirection": "h",
+            "targets": [{
+                "datasource": {
+                    "type": "influxdb"
+                },
+                "groupBy": [{
+                        "params": [
+                            "$__interval"
+                        ],
+                        "type": "time"
+                    },
+                    {
+                        "params": [
+                            "null"
+                        ],
+                        "type": "fill"
+                    }
+                ],
+                "hide": false,
+                "orderByTime": "ASC",
+                "policy": "default",
+                "query": "from(bucket: \"api_results\")\n|> range(start: -24h)\n|> filter(fn: (r) => r[\"_measurement\"] == \"${measurement}\")\n|> filter(fn: (r) => r[\"collection_name\"] == \"${collectionName}\")\n|> keyValues(keyColumns: [\"request_name\"]) \n|> group(columns: [\"failed\"])\n|> distinct(column: \"request_name\")\n|> group(columns: [\"request_name\"])\n",
+                "refId": "Status Code",
+                "resultFormat": "time_series",
+                "select": [
+                    [{
+                            "params": [
+                                "value"
+                            ],
+                            "type": "field"
+                        },
+                        {
+                            "params": [],
+                            "type": "mean"
+                        }
+                    ]
+                ],
+                "tags": []
+            }],
+            "title": "Failed Tests per Endpoint",
+            "transformations": [{
+                    "id": "groupBy",
+                    "options": {
+                        "fields": {
+                            "_value": {
+                                "aggregations": [],
+                                "operation": "groupby"
+                            },
+                            "failed": {
+                                "aggregations": [
+                                    "lastNotNull"
+                                ],
+                                "operation": "groupby"
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {},
+                        "indexByName": {
+                            "_value": 0,
+                            "failed": 1
+                        },
+                        "renameByName": {
+                            "_value": "Endpoint",
+                            "_value (lastNotNull)": "Endpoint",
+                            "failed": "Failed Test"
+                        }
+                    }
+                }
+            ],
+            "type": "table"
+        }
+    ],
+    "refresh": "",
+    "schemaVersion": 34,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+        "list": [{
+                "current": {
+                    "selected": false,
+                    "text": "k8s_testing",
+                    "value": "k8s_testing"
+                },
+                "datasource": {
+                    "type": "influxdb"
+                },
+                "definition": "import \"influxdata/influxdb/v1\"\nv1.measurements(bucket: v.bucket)",
+                "description": "",
+                "hide": 0,
+                "includeAll": false,
+                "label": "measurement",
+                "multi": false,
+                "name": "measurement",
+                "options": [],
+                "query": "import \"influxdata/influxdb/v1\"\nv1.measurements(bucket: v.bucket)",
+                "refresh": 1,
+                "regex": "",
+                "skipUrlSync": false,
+                "sort": 1,
+                "tagValuesQuery": "",
+                "tagsQuery": "",
+                "type": "query",
+                "useTags": false
+            },
+            {
+                "current": {
+                    "selected": false,
+                    "text": "MP20_Allergy_REST_APIs",
+                    "value": "MP20_Allergy_APIs"
+                },
+                "datasource": {
+                    "type": "influxdb"
+                },
+                "definition": "import \"influxdata/influxdb/schema\"\n\nschema.measurementTagValues(\n  bucket: \"api_results\",\n  measurement: \"${measurement}\",\n  tag: \"collection_name\"\n)",
+                "description": "filter by collection name",
+                "hide": 0,
+                "includeAll": false,
+                "multi": false,
+                "name": "collectionName",
+                "options": [],
+                "query": "import \"influxdata/influxdb/schema\"\n\nschema.measurementTagValues(\n  bucket: \"api_results\",\n  measurement: \"${measurement}\",\n  tag: \"collection_name\"\n)",
+                "refresh": 1,
+                "regex": "",
+                "skipUrlSync": false,
+                "sort": 1,
+                "tagValuesQuery": "",
+                "tagsQuery": "",
+                "type": "query",
+                "useTags": false
+            }
+        ]
+    },
+    "time": {
+        "from": "now-6h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "BE API Daily Testing - Failed APIs Report",
+    "uid": "sQCu6-o7k",
+    "version": 29,
+    "weekStart": ""
+}

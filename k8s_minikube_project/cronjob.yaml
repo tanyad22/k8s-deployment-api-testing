@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: newman
+spec:
+  jobTemplate:
+    metadata:
+    spec:
+      template:
+        metadata:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: newman
+            image: newman:1.0
+            imagePullPolicy: Never
+            args:
+             - run
+             - MP20_Allergy_REST_APIs_collection.json
+             - -e
+             - TEST-MP-NL.postman_environment.json
+             - -r
+             - influxdb
+             - --reporter-influxdb-server
+             - influxdb-service
+             - --reporter-influxdb-port
+             - "8086"
+             - --reporter-influxdb-org
+             - h4h
+             - --reporter-influxdb-version
+             - "2"
+             - --reporter-influxdb-username
+             - newman
+             - --reporter-influxdb-password
+             - Tphalo8c
+             - --reporter-influxdb-name
+             - api_results
+             - --reporter-influxdb-measurement
+             - k8s_testing
+  schedule: '0 08 * * 1-5'

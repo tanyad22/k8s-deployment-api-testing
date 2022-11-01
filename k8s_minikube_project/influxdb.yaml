@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb-deployment
+  labels:
+    app: influxdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb:2.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8086
+        volumeMounts:
+        - mountPath: /var/lib/influxdb
+          name: var-lib-influxdb
+        env:
+        - name: DOCKER_INFLUXDB_INIT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: influxdb-secret
+              key: influxdb_username
+        - name: DOCKER_INFLUXDB_INIT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: influxdb-secret
+              key: influxdb_password
+        - name: DOCKER_INFLUXDB_INIT_ORG
+          valueFrom:
+            secretKeyRef:
+              name: influxdb-secret
+              key: influxdb_org
+        - name: DOCKER_INFLUXDB_INIT_BUCKET
+          valueFrom:
+            secretKeyRef:
+              name: influxdb-secret
+              key: influxdb_bucket
+        - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: influxdb-secret
+              key: influxdb_token
+        - name: DOCKER_INFLUXDB_INIT_MODE
+          valueFrom:
+            secretKeyRef:
+              name: influxdb-secret
+              key: influxdb_mode
+      volumes:
+      - name: var-lib-influxdb
+        persistentVolumeClaim:
+          claimName: influxdb
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb-service
+spec:
+  selector:
+    app: influxdb
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8086
+      targetPort: 8086
+      nodePort: 30000

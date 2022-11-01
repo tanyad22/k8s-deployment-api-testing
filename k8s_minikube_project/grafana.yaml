@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-deployment
+  labels:
+    app: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        volumeMounts:
+        - mountPath: /etc/grafana/provisioning/datasources/influxdb-datasource.yml
+          name: grafana-config
+          readOnly: true
+          subPath: influxdb-datasource.yml
+        - mountPath: /etc/grafana/provisioning/dashboards/grafana-dashboard-provider.yml
+          name: grafana-config
+          readOnly: true
+          subPath: grafana-dashboard-provider.yml
+        - mountPath: /var/lib/grafana/dashboards/newman-dashboard.json
+          name: grafana-config
+          readOnly: true
+          subPath: newman-dashboard.json
+        image: grafana/grafana
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: grafana-secret
+              key: grafana_username
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-secret
+              key: grafana_password
+      volumes:
+      - name: grafana-config
+        configMap:
+          name: grafana-config
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-service
+spec:
+  selector:
+    app: grafana
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 30001
