@@ -12,7 +12,7 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: newman
-            image: newman:1.0
+            image: gcr.io/vernal-isotope-360913/newman:1.0
             imagePullPolicy: Never
             args:
              - run
