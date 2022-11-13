@@ -13,8 +13,8 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: newman
-            image: newman:1.0
-            imagePullPolicy: Never
+            image: gcr.io/vernal-isotope-360913/newman:1.0
+            imagePullPolicy: IfNotPresent
             args:
              - run
              - MP20_Patient_REST_APIs_collection.json
