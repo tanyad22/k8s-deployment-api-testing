@@ -38,6 +38,6 @@ spec:
              - api_results
              - --reporter-influxdb-measurement
              - k8s_testing
-  schedule: '45 7 * * *'
+  schedule: '12 * * * *'
 
 
